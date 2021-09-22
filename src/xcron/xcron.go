@@ -5,12 +5,14 @@ import (
 	"sync"
 )
 
+//xCron 调度核心模型
 type xCron struct {
 	cron   *cron.Cron
 	lock   *sync.RWMutex
 	jobMap map[string]int
 }
 
+//IJob job接口
 type IJob interface {
 	Run()
 	JsonName() string
@@ -75,4 +77,10 @@ func (c *xCron) Add(cron, jobName string, fn func()) (id int, err error) {
 	c.jobMap[jobName] = int(id)
 	return
 
+}
+
+//Stop 停止调度
+func (c *xCron) Stop() {
+	c.jobMap = nil
+	c.cron.Stop()
 }
