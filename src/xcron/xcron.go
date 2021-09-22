@@ -30,6 +30,13 @@ func NewXCron() *xCron {
 
 }
 
+//Start 开启
+func (c *xCron) Start() {
+
+	c.cron.Start()
+
+}
+
 //Put 塞入job
 func (c *xCron) Put(job IJob) (id int, err error) {
 	if len(job.JsonName()) <= 0 {
