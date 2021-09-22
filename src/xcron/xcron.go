@@ -29,19 +29,21 @@ func NewXCron() *xCron {
 }
 
 //Put 塞入job
-func (c *xCron) Put(job IJob) (id cron.EntryID, err error) {
+func (c *xCron) Put(job IJob) (id int, err error) {
 	if len(job.JsonName()) <= 0 {
 		panic("请实现JobName()方法...")
 	}
 
 	defer c.lock.Unlock()
 	c.lock.Lock()
-	id, err = c.cron.AddJob(job.Cron(), job)
+	i, err := c.cron.AddJob(job.Cron(), job)
+	id = int(i)
 
 	if err != nil {
-		//记录下来
-		c.jobMap[job.JsonName()] = int(id)
+		return 0, err
 	}
+	//记录下来
+	c.jobMap[job.JsonName()] = int(id)
 	return
 }
 
@@ -54,4 +56,23 @@ func (c *xCron) Remove(jobName string) {
 		c.cron.Remove(cron.EntryID(j))
 	}
 	return
+}
+
+//Add 添加函数job
+func (c *xCron) Add(cron, jobName string, fn func()) (id int, err error) {
+
+	defer c.lock.Unlock()
+	c.lock.Lock()
+
+	i, err := c.cron.AddFunc(cron, fn)
+	id = int(i)
+
+	if err != nil {
+		return
+	}
+
+	//记录下来
+	c.jobMap[jobName] = int(id)
+	return
+
 }
