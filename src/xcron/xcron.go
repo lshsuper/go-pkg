@@ -14,6 +14,7 @@ type xCron struct {
 type IJob interface {
 	Run()
 	JsonName() string
+	Cron() string
 }
 
 func NewXCron() *xCron {
@@ -35,7 +36,7 @@ func (c *xCron) Put(job IJob) (id cron.EntryID, err error) {
 
 	defer c.lock.Unlock()
 	c.lock.Lock()
-	id, err = c.cron.AddJob(job.JsonName(), job)
+	id, err = c.cron.AddJob(job.Cron(), job)
 
 	if err != nil {
 		//记录下来
