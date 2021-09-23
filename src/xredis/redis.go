@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
-	"go-pkg/src/xredis/domain"
+	"github.com/lshsuper/go-pkg/src/xredis/domain"
 	"sync"
 	"time"
 )
@@ -197,5 +197,40 @@ func (c *xRedis) ListPop(ctx context.Context, p domain.Position, key string) (in
 		return nil, err
 	}
 	return res, err
+
+}
+
+//LockAndTake 锁并执行
+func (c *xRedis) LockAndTake(ctx context.Context, key string, expiration time.Duration, callback func()) {
+
+	cmd := c.xClient.SetNX(ctx, key, 1, expiration)
+	res, err := cmd.Result()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if !res {
+		fmt.Println("锁着那...")
+		return
+	}
+
+	callback()
+	fmt.Println("执行完毕")
+	c.xClient.Del(ctx, key)
+	return
+
+}
+
+func (c *xRedis) OptimisticLock(ctx context.Context, key string, expiration time.Duration) error {
+
+	return c.xClient.Watch(ctx, func(tx *redis.Tx) error {
+		// 操作仅在 Watch 的 Key 没发生变化的情况下提交
+		_, err := tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+			pipe.Set(ctx, key, "_lock", expiration)
+			return nil
+		})
+		return err
+	}, key)
 
 }

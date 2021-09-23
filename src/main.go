@@ -1,1 +1,5 @@
-package src
+package main
+
+func main() {
+
+}

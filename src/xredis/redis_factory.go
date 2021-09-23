@@ -1,7 +1,7 @@
 package xredis
 
 import (
-	"go-pkg/src/xredis/domain"
+	"github.com/lshsuper/go-pkg/src/xredis/domain"
 	"sync"
 )
 
