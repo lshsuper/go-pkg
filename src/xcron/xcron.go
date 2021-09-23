@@ -14,7 +14,7 @@ type xCron struct {
 
 //IJob job接口
 type IJob interface {
-	Run()
+	cron.Job
 	JsonName() string
 	Cron() string
 }

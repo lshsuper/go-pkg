@@ -1,4 +1,4 @@
-module go-pkg
+module github.com/lshsuper/go-pkg
 
 go 1.16
 
