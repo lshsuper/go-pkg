@@ -211,12 +211,10 @@ func (c *xRedis) LockAndTake(ctx context.Context, key string, expiration time.Du
 	}
 
 	if !res {
-		fmt.Println("锁着那...")
 		return
 	}
 
 	callback()
-	fmt.Println("执行完毕")
 	c.xClient.Del(ctx, key)
 	return
 
