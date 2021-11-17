@@ -2,36 +2,43 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"github.com/lshsuper/go-pkg/src/oauth/jwt"
 )
+
+
+type UserInfo struct {
+	UserID int `json:"userId"`
+	Name string  `json:"name"`
+}
 
 func main() {
 
-	ch := make(chan bool, 0)
 
-	go func() {
-		for {
-			ch <- true
-			time.Sleep(time.Second * 1)
-		}
-	}()
 
-	go func() {
 
-		for {
+	token,err:=jwt.GetToken(jwt.TokenRequest{
+		SigningKey: "abcdefg",
+		Parms: map[string]interface{}{
+			"userId":123456,
+			"name":"lsh",
+		},
+	})
 
-			select {
-			case c := <-ch:
-				fmt.Println(c)
 
-			}
+	fmt.Println(token,err)
 
-			fmt.Println("break...")
-		}
-		fmt.Println("退出。。。")
+	  m:=&UserInfo{}
 
-	}()
+	err=jwt.CheckToken(jwt.CheckTokenRequest{
+		TokenStr: token,
+		SigningKey:"abcdefg",
+	},m)
 
-	time.Sleep(time.Second * 60)
+
+
+
+	fmt.Println(m,err)
+
+
 
 }
