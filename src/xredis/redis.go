@@ -232,3 +232,10 @@ func (c *xRedis) OptimisticLock(ctx context.Context, key string, expiration time
 	}, key)
 
 }
+//HashLen hash列表数量
+func (c *xRedis)HashLen(ctx context.Context,key string)(int,error)  {
+
+	cmd := c.xClient.HLen(ctx,key)
+	num,err:=cmd.Result()
+    return int(num),err
+}
